@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function updateSessionTypeDisplay() {
                 if (currentType === 'Pomodoro') {
-                    sessionTypeElement.textContent = `Pomodoro (Session ${sessionCount + 1})`;
+                    sessionTypeElement.textContent = `Pomodoro #${sessionCount + 1}`;
                 } else {
                     sessionTypeElement.textContent = currentType;
                 }
