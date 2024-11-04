@@ -1,16 +1,36 @@
 #pomodoro-timer {
     width: 300px;
     height: 300px;
-    border: 5px solid #00d1b2; /* Primary color */
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 48px;
     margin: 0 auto;
-    background-color: #f5f5f5;
     position: relative;
 }
 #session-type {
     text-align: center;
+}
+
+.circular-progress-wrapper {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.progress-ring__circle {
+    stroke: #00d1b2; /* Primary color */
+    stroke-dasharray: 880; /* Circumference for a 140px radius */
+    stroke-dashoffset: 880;
+    transition: stroke-dashoffset 0.35s;
+    stroke-linecap: round;
 }

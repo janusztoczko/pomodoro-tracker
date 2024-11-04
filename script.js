@@ -1,58 +1,44 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Load configuration
     fetch('config.json')
         .then(response => response.json())
         .then(config => {
             const timerElement = document.getElementById('pomodoro-timer');
             const sessionTypeElement = document.getElementById('session-type');
             const timezonesContainer = document.getElementById('timezones-container');
+            const circle = document.querySelector('.progress-ring__circle');
+            const radius = circle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = circumference;
+
             let isRunning = false;
             let duration = config.pomodoroDuration * 60;
             let currentType = 'Pomodoro';
-            let sessionCount = 0; // To track completed Pomodoro sessions
+            let sessionCount = 0;
             let interval;
+            let totalDuration = duration;
 
-            // Function to format time based on template
-            function formatTime(date, template) {
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                const seconds = String(date.getSeconds()).padStart(2, '0');
-
-                return template
-                    .replace('HH', hours)
-                    .replace('MM', minutes)
-                    .replace('SS', seconds);
-            }
-
-            // Display current time for each time zone
-            function updateTimezones() {
-                timezonesContainer.innerHTML = ''; // Clear existing content
-                config.timezones.forEach(timezone => {
-                    const currentTime = new Date().toLocaleString('en-US', { timeZone: timezone });
-                    const date = new Date(currentTime);
-                    const formattedTime = formatTime(date, config.timeTemplate || 'HH:MM:SS');
-                    const timezoneElement = document.createElement('div');
-                    timezoneElement.className = 'timezone';
-                    timezoneElement.textContent = `${timezone}: ${formattedTime}`;
-                    timezonesContainer.appendChild(timezoneElement);
-                });
-            }
-
-            // Update the time every second
-            setInterval(updateTimezones, 1000);
-
-            // Set the initial duration based on configuration
             function updateTimerDisplay(timeInSeconds) {
                 const minutes = String(Math.floor(timeInSeconds / 60)).padStart(2, '0');
                 const seconds = String(Math.floor(timeInSeconds % 60)).padStart(2, '0');
                 timerElement.textContent = `${minutes}:${seconds}`;
+
+                // Update the progress circle
+                const progress = timeInSeconds / totalDuration;
+                setCircleProgress(progress);
             }
 
-            updateTimerDisplay(duration);
+            function setCircleProgress(progress) {
+                const offset = circumference * (1 - progress);
+                circle.style.strokeDashoffset = offset;
+            }
 
             function startTimer() {
                 const endTime = Date.now() + duration * 1000;
                 updateSessionTypeDisplay();
+                totalDuration = duration; // Set the duration for progress calculation
+
                 interval = setInterval(() => {
                     const remaining = Math.max((endTime - Date.now()) / 1000, 0);
                     updateTimerDisplay(remaining);
