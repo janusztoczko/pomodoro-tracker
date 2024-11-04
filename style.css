@@ -1,26 +1,61 @@
+body {
+    background: var(--secondary);
+    color: var(--primary);
+}
+
+h2 {
+    color: var(--primary) !important;
+    font-weight: 100 !important;
+}
+
+.section {
+    width: 100vw;
+    height: 100vh;
+    background-image: var(--backgroundImage);
+    background-size: cover;
+    background-position: center;
+    padding: 1rem!important;
+}
+
+#timezones-container{
+    font-size: 1.5rem;
+    font-weight: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.timezone-heading{
+    font-weight:300;
+}
+
 #pomodoro-timer {
-    width: 300px;
-    height: 300px;
+    width: 50vw;
+    height: 50vw;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 48px;
+    font-weight: 100;
     margin: 0 auto;
     position: relative;
 }
+
 #session-type {
     text-align: center;
 }
 
 .circular-progress-wrapper {
     position: relative;
-    width: 300px;
-    height: 300px;
+    width: 50vw;
+    height: 50vw;
     margin: 0 auto;
 }
 
 .progress-ring {
+    width: 50vw;
+    height: 50vw;
     transform: rotate(-90deg);
     position: absolute;
     top: 0;
@@ -28,7 +63,7 @@
 }
 
 .progress-ring__circle {
-    stroke: #00d1b2; /* Primary color */
+    stroke: var(--primary); /* Primary color */
     stroke-dasharray: 880; /* Circumference for a 140px radius */
     stroke-dashoffset: 880;
     transition: stroke-dashoffset 0.35s;

@@ -1,5 +1,5 @@
 {
-  "timezones": ["America/New_York", "Europe/London", "Europe/Warsaw"],
+  "timezones": ["America/Los_Angeles","America/Chicago","America/New_York", "Europe/London", "Europe/Warsaw","Europe/Vilnius"],
   "pomodoroDuration": 25,
   "shortBreakDuration": 5,
   "longBreakDuration": 15,
@@ -7,10 +7,10 @@
   "timeTemplate": "HH:MM",
   "startPomodoroSound": "assets/start-pomodoro.mp3",
   "startBreakSound": "assets/start-break.mp3",
-  "backgroundImage": "url('assets/background.jpg')",
+  "backgroundImage": "url('/assets/corridor.jpg')",
   "colors": {
-    "primary": "#00d1b2",
-    "secondary": "#ffdd57",
+    "primary": "#ffffff",
+    "secondary": "#000000",
     "tertiary": "#3273dc",
     "quaternary": "#23d160",
     "quinary": "#ff3860"

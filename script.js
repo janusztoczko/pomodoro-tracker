@@ -22,8 +22,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // Set the initial display based on config
             function updateInitialTimerDisplay() {
                 const minutes = String(Math.floor(config.pomodoroDuration)).padStart(2, '0');
-                const seconds = '00'; // Initial seconds always start at 00
+                const seconds = '00';
                 timerElement.textContent = `${minutes}:${seconds}`;
+            }
+
+            // Set CSS variables for colors
+            function setCssVariables(config) {
+                const root = document.documentElement;
+                for (const [key, value] of Object.entries(config.colors)) {
+                    root.style.setProperty(`--${key}`, value);
+                }
+                root.style.setProperty(`--backgroundImage`, config.backgroundImage);
             }
 
             function updateTimerDisplay(timeInSeconds) {
@@ -119,8 +128,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            // Function to display current time for each time zone
+            function updateTimezones() {
+                timezonesContainer.innerHTML = ''; // Clear existing content
+                config.timezones.forEach(timezone => {
+                    const currentTime = new Date().toLocaleTimeString('en-US', { timeZone: timezone });
+                    const timezoneElement = document.createElement('div');
+                    timezoneElement.className = 'timezone';
+                    timezoneElement.innerHTML = `<div class="timezone-heading">${timezone}</div>${currentTime}`;
+                    timezonesContainer.appendChild(timezoneElement);
+                });
+            }
+
+            // Update the time zones every second
+            setInterval(updateTimezones, 1000);
+
             // Set initial display of timer on page load
             updateInitialTimerDisplay();
+            setCssVariables(config);
 
             timerElement.addEventListener('click', toggleTimer);
         })
