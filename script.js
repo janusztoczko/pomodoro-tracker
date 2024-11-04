@@ -52,8 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function startTimer() {
                 const endTime = Date.now() + duration * 1000;
-                sessionTypeElement.textContent = currentType;
-
+                updateSessionTypeDisplay();
                 interval = setInterval(() => {
                     const remaining = Math.max((endTime - Date.now()) / 1000, 0);
                     updateTimerDisplay(remaining);
@@ -98,7 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     duration = config.pomodoroDuration * 60;
                 }
                 updateTimerDisplay(duration);
-                sessionTypeElement.textContent = currentType;
+                updateSessionTypeDisplay();
+            }
+
+            function updateSessionTypeDisplay() {
+                if (currentType === 'Pomodoro') {
+                    sessionTypeElement.textContent = `Pomodoro (Session ${sessionCount + 1})`;
+                } else {
+                    sessionTypeElement.textContent = currentType;
+                }
             }
 
             function sendWebhook(message) {
