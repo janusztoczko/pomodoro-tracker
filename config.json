@@ -1,0 +1,22 @@
+{
+  "timezones": ["America/New_York", "Europe/London", "Europe/Warsaw"],
+  "pomodoroDuration": 0.5,
+  "shortBreakDuration": 0.25,
+  "longBreakDuration": 0.1,
+  "breakInterval": 4,
+  "startPomodoroSound": "assets/start-pomodoro.mp3",
+  "startBreakSound": "assets/start-break.mp3",
+  "backgroundImage": "url('assets/background.jpg')",
+  "colors": {
+    "primary": "#00d1b2",
+    "secondary": "#ffdd57",
+    "tertiary": "#3273dc",
+    "quaternary": "#23d160",
+    "quinary": "#ff3860"
+  },
+  "webhooks": {
+    "startPomodoro": ["https://example.com/start-pomodoro"],
+    "startBreak": ["https://example.com/start-break"],
+    "endSession": ["https://example.com/end-session"]
+  }
+}
