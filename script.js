@@ -13,11 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
             circle.style.strokeDashoffset = circumference;
 
             let isRunning = false;
-            let duration = config.pomodoroDuration * 60;
+            let duration = config.pomodoroDuration * 60; // Duration in seconds
             let currentType = 'Pomodoro';
             let sessionCount = 0;
             let interval;
             let totalDuration = duration;
+
+            // Set the initial display based on config
+            function updateInitialTimerDisplay() {
+                const minutes = String(Math.floor(config.pomodoroDuration)).padStart(2, '0');
+                const seconds = '00'; // Initial seconds always start at 00
+                timerElement.textContent = `${minutes}:${seconds}`;
+            }
 
             function updateTimerDisplay(timeInSeconds) {
                 const minutes = String(Math.floor(timeInSeconds / 60)).padStart(2, '0');
@@ -111,6 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             }
+
+            // Set initial display of timer on page load
+            updateInitialTimerDisplay();
 
             timerElement.addEventListener('click', toggleTimer);
         })
