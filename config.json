@@ -4,6 +4,7 @@
   "shortBreakDuration": 0.25,
   "longBreakDuration": 0.1,
   "breakInterval": 4,
+  "timeTemplate": "HH:MM:SS",
   "startPomodoroSound": "assets/start-pomodoro.mp3",
   "startBreakSound": "assets/start-break.mp3",
   "backgroundImage": "url('assets/background.jpg')",

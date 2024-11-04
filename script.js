@@ -12,14 +12,28 @@ document.addEventListener('DOMContentLoaded', () => {
             let sessionCount = 0; // To track completed Pomodoro sessions
             let interval;
 
+            // Function to format time based on template
+            function formatTime(date, template) {
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+
+                return template
+                    .replace('HH', hours)
+                    .replace('MM', minutes)
+                    .replace('SS', seconds);
+            }
+
             // Display current time for each time zone
             function updateTimezones() {
                 timezonesContainer.innerHTML = ''; // Clear existing content
                 config.timezones.forEach(timezone => {
-                    const currentTime = new Date().toLocaleTimeString('en-US', { timeZone: timezone });
+                    const currentTime = new Date().toLocaleString('en-US', { timeZone: timezone });
+                    const date = new Date(currentTime);
+                    const formattedTime = formatTime(date, config.timeTemplate || 'HH:MM:SS');
                     const timezoneElement = document.createElement('div');
                     timezoneElement.className = 'timezone';
-                    timezoneElement.textContent = `${timezone}: ${currentTime}`;
+                    timezoneElement.textContent = `${timezone}: ${formattedTime}`;
                     timezonesContainer.appendChild(timezoneElement);
                 });
             }
