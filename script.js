@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     urls.forEach(url => {
                         fetch(url, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: {'Content-Type': 'application/json'},
                             body: JSON.stringify({
                                 message: message,
                                 timestamp: new Date().toISOString()
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             function updateTimezones() {
                 timezonesContainer.innerHTML = ''; // Clear existing content
                 config.timezones.forEach(timezone => {
-                    const currentTime = new Date().toLocaleTimeString('en-US', { timeZone: timezone });
+                    const currentTime = new Date().toLocaleTimeString('en-US', {timeZone: timezone});
                     const timezoneElement = document.createElement('div');
                     timezoneElement.className = 'timezone';
                     timezoneElement.innerHTML = `<div class="timezone-heading">${timezone}</div>${currentTime}`;
