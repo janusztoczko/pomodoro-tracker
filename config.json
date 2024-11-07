@@ -7,7 +7,7 @@
   "timeTemplate": "HH:MM",
   "startPomodoroSound": "assets/start-pomodoro.mp3",
   "startBreakSound": "assets/start-break.mp3",
-  "backgroundImage": "url('/assets/nightsky.jpg')",
+  "backgroundImage": "url('assets/nightsky.jpg')",
   "colors": {
     "primary": "#ffffff",
     "secondary": "#000000",
