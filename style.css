@@ -30,12 +30,10 @@ h2 {
 }
 
 .timezone{
-    margin-bottom: 10px;
     display: grid;
     grid-template-columns: 190px 110px auto;
     width: auto;
     align-items: center;
-
 }
 
 .timezone-weather{
@@ -43,6 +41,10 @@ h2 {
     display:flex;
     justify-content:left;
     align-items:center;
+}
+
+.timezone-weather img{
+    width:42px
 }
 
 .timezone-heading {
