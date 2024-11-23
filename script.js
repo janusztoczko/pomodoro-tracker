@@ -183,8 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Update the time zones every second
-            setInterval(updateTimezones, 1000);
+            // Update the time zones every minute
+            setInterval(updateTimezones, 60000);
 
             // Set weather update interval to 1 hour
             setInterval(updateTimezones, 3600000);
