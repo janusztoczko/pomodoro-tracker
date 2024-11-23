@@ -163,7 +163,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     timezoneElement.innerHTML = `
                         <div class="timezone-heading">${cityName}</div>
                         <div class="timezone-time">${currentTime}</div>
-                        <div class="timezone-weather">${weather}</div>
+                        <div class="timezone-weather">
+                            ${weather.icon ? `<img src="${weather.icon}" alt="Weather icon" />` : ''}
+                            ${weather.temp ? weather.temp : 'Weather unavailable'}
+                        </div>
                     `;
                     timezonesContainer.appendChild(timezoneElement);
                 });
@@ -186,12 +189,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response.ok) {
                         const data = await response.json();
                         const unit = metric === 'metric' ? '°C' : '°F';
-                        return `${data.weather[0].description}, ${data.main.temp}${unit}`;
+                        return {
+                            icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
+                            temp: `${data.main.temp}${unit}`
+                        };
                     }
-                    return 'Weather unavailable';
+                    return { icon: null, temp: 'Weather unavailable' };
                 } catch (err) {
                     console.error(`Error fetching weather for ${cityName}:`, err);
-                    return 'Weather unavailable';
+                    return { icon: null, temp: 'Weather unavailable' };
                 }
             }
 
