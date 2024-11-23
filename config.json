@@ -1,13 +1,13 @@
 {
   "timezones": [
-    "Asia/Tokyo",
-    "America/Los_Angeles",
-    "America/Chicago",
-    "America/New_York",
-    "America/Argentina/Buenos_Aires",
-    "Europe/London",
-    "Europe/Warsaw",
-    "Europe/Vilnius"
+    { "name": "Asia/Tokyo", "metric": "metric" },
+    { "name": "America/Los_Angeles", "metric": "imperial" },
+    { "name": "America/Chicago", "metric": "metric" },
+    { "name": "America/New_York", "metric": "imperial" },
+    { "name": "America/Argentina/Buenos_Aires", "metric": "metric" },
+    { "name": "Europe/London", "metric": "metric" },
+    { "name": "Europe/Warsaw", "metric": "metric" },
+    { "name": "Europe/Vilnius", "metric": "metric" }
   ],
   "pomodoroDuration": 25,
   "shortBreakDuration": 5,

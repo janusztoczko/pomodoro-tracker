@@ -148,10 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
             function updateTimezones() {
                 timezonesContainer.innerHTML = ''; // Clear existing content
                 config.timezones.forEach(timezone => {
-                    const cityName = timezone.split('/').pop().replace('_', ' ');
+                    const cityName = timezone.name.split('/').pop().replace('_', ' ');
 
                     const currentTime = new Date().toLocaleTimeString('en-US', {
-                        timeZone: timezone,
+                        timeZone: timezone.name,
                         hour: '2-digit',
                         minute: '2-digit'
                     });
@@ -172,20 +172,21 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fetch weather data for all cities
             async function fetchWeatherForCities() {
                 for (const timezone of config.timezones) {
-                    const cityName = timezone.split('/').pop().replace('_', ' ');
-                    const weather = await fetchWeather(cityName);
+                    const cityName = timezone.name.split('/').pop().replace('_', ' ');
+                    const weather = await fetchWeather(cityName, timezone.metric);
                     weatherData[cityName] = weather;
                 }
             }
 
-            async function fetchWeather(cityName) {
+            async function fetchWeather(cityName, metric) {
                 try {
                     const response = await fetch(
-                        `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=metric`
+                        `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=${metric}`
                     );
                     if (response.ok) {
                         const data = await response.json();
-                        return `${data.weather[0].description}, ${data.main.temp}°C`;
+                        const unit = metric === 'metric' ? '°C' : '°F';
+                        return `${data.weather[0].description}, ${data.main.temp}${unit}`;
                     }
                     return 'Weather unavailable';
                 } catch (err) {
