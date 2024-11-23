@@ -29,6 +29,10 @@ h2 {
     border-radius: 4vh;
 }
 
+.timezone{
+    margin-bottom: 10px;
+}
+
 .timezone-heading {
     font-weight: 300;
 }

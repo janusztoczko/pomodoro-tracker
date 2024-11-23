@@ -199,8 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
             await fetchWeatherForCities();
             setInterval(fetchWeatherForCities, 3600000); // Update weather every hour
 
-            // Update the time zones every second
-            setInterval(updateTimezones, 1000);
+            // Update the time zones every 10 seconds
+            setInterval(updateTimezones, 10000);
 
             // Set initial display of timer on page load
             updateInitialTimerDisplay();
