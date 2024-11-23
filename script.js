@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let interval;
             let totalDuration = duration;
 
+            // To store the latest weather data
+            const weatherData = {};
+
             // Set the initial display based on config
             function updateInitialTimerDisplay() {
                 const minutes = String(Math.floor(config.pomodoroDuration)).padStart(2, '0');
@@ -141,10 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Function to display current time and weather for each time zone
-            async function updateTimezones() {
+            // Function to display current time for each time zone
+            function updateTimezones() {
                 timezonesContainer.innerHTML = ''; // Clear existing content
-                for (const timezone of config.timezones) {
+                config.timezones.forEach(timezone => {
                     const cityName = timezone.split('/').pop().replace('_', ' ');
 
                     const currentTime = new Date().toLocaleTimeString('en-US', {
@@ -153,8 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         minute: '2-digit'
                     });
 
-                    // Get weather information
-                    const weather = await fetchWeather(cityName);
+                    const weather = weatherData[cityName] || 'Fetching...';
 
                     const timezoneElement = document.createElement('div');
                     timezoneElement.className = 'timezone';
@@ -164,6 +166,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="timezone-weather">${weather}</div>
                     `;
                     timezonesContainer.appendChild(timezoneElement);
+                });
+            }
+
+            // Fetch weather data for all cities
+            async function fetchWeatherForCities() {
+                for (const timezone of config.timezones) {
+                    const cityName = timezone.split('/').pop().replace('_', ' ');
+                    const weather = await fetchWeather(cityName);
+                    weatherData[cityName] = weather;
                 }
             }
 
@@ -183,11 +194,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Update the time zones every minute
-            setInterval(updateTimezones, 60000);
+            // Fetch weather initially and then update hourly
+            await fetchWeatherForCities();
+            setInterval(fetchWeatherForCities, 3600000); // Update weather every hour
 
-            // Set weather update interval to 1 hour
-            setInterval(updateTimezones, 3600000);
+            // Update the time zones every second
+            setInterval(updateTimezones, 1000);
 
             // Set initial display of timer on page load
             updateInitialTimerDisplay();
