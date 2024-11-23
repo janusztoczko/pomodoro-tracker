@@ -1,13 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Retrieve the API key from the URL
+    function getApiKeyFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('weatherApiKey');
+    }
+
     fetch('config.json')
         .then(response => response.json())
-        .then(config => {
+        .then(async config => {
             const timerElement = document.getElementById('pomodoro-timer');
             const sessionTypeElement = document.getElementById('session-type');
             const timezonesContainer = document.getElementById('timezones-container');
             const circle = document.querySelector('.progress-ring__circle');
             const radius = circle.r.baseVal.value;
             const circumference = 2 * Math.PI * radius;
+
+            const API_KEY = getApiKeyFromUrl(); // Get API key from URL
+
+            if (!API_KEY) {
+                console.error('Weather API key is missing in the URL. Add ?weatherApiKey=YOUR_KEY to the URL.');
+                return;
+            }
 
             circle.style.strokeDasharray = `${circumference} ${circumference}`;
             circle.style.strokeDashoffset = circumference;
@@ -53,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             function startTimer() {
                 const endTime = Date.now() + duration * 1000;
                 updateSessionTypeDisplay();
-                totalDuration = duration; // Set the duration for progress calculation
+                totalDuration = duration;
 
                 interval = setInterval(() => {
                     const remaining = Math.max((endTime - Date.now()) / 1000, 0);
@@ -118,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     urls.forEach(url => {
                         fetch(url, {
                             method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 message: message,
                                 timestamp: new Date().toISOString()
@@ -128,20 +141,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Function to display current time for each time zone
-            function updateTimezones() {
+            // Function to display current time and weather for each time zone
+            async function updateTimezones() {
                 timezonesContainer.innerHTML = ''; // Clear existing content
-                config.timezones.forEach(timezone => {
-                    const currentTime = new Date().toLocaleTimeString('en-US', {timeZone: timezone});
+                for (const timezone of config.timezones) {
+                    const cityName = timezone.split('/').pop().replace('_', ' ');
+
+                    const currentTime = new Date().toLocaleTimeString('en-US', {
+                        timeZone: timezone,
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    // Get weather information
+                    const weather = await fetchWeather(cityName);
+
                     const timezoneElement = document.createElement('div');
                     timezoneElement.className = 'timezone';
-                    timezoneElement.innerHTML = `<div class="timezone-heading">${timezone}</div>${currentTime}`;
+                    timezoneElement.innerHTML = `
+                        <div class="timezone-heading">${cityName}</div>
+                        <div class="timezone-time">${currentTime}</div>
+                        <div class="timezone-weather">${weather}</div>
+                    `;
                     timezonesContainer.appendChild(timezoneElement);
-                });
+                }
+            }
+
+            async function fetchWeather(cityName) {
+                try {
+                    const response = await fetch(
+                        `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=metric`
+                    );
+                    if (response.ok) {
+                        const data = await response.json();
+                        return `${data.weather[0].description}, ${data.main.temp}°C`;
+                    }
+                    return 'Weather unavailable';
+                } catch (err) {
+                    console.error(`Error fetching weather for ${cityName}:`, err);
+                    return 'Weather unavailable';
+                }
             }
 
             // Update the time zones every second
             setInterval(updateTimezones, 1000);
+
+            // Set weather update interval to 1 hour
+            setInterval(updateTimezones, 3600000);
 
             // Set initial display of timer on page load
             updateInitialTimerDisplay();
