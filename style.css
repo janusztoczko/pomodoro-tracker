@@ -31,6 +31,18 @@ h2 {
 
 .timezone{
     margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 200px 100px auto;
+    width: auto;
+    align-items: center;
+
+}
+
+.timezone-weather{
+    margin-left:40px;
+    display:flex;
+    justify-content:left;
+    align-items:center;
 }
 
 .timezone-heading {
