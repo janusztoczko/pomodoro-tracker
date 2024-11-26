@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // To store the latest weather data
             const weatherData = {};
 
+            // Track whether to display metric or imperial temperatures
+            let showMetric = true;
+
             // Set the initial display based on config
             function updateInitialTimerDisplay() {
                 const minutes = String(Math.floor(config.pomodoroDuration)).padStart(2, '0');
@@ -156,7 +159,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         minute: '2-digit'
                     });
 
-                    const weather = weatherData[cityName] || 'Fetching...';
+                    const weather = weatherData[cityName];
+                    const temp = weather
+                        ? showMetric
+                            ? weather.metric.temp
+                            : weather.imperial.temp
+                        : 'Fetching...';
+
+                    const icon = weather ? weather.icon : '';
 
                     const timezoneElement = document.createElement('div');
                     timezoneElement.className = 'timezone';
@@ -164,40 +174,45 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="timezone-heading">${cityName}</div>
                         <div class="timezone-time">${currentTime}</div>
                         <div class="timezone-weather">
-                            ${weather.icon ? `<img src="${weather.icon}" alt="Weather icon" />` : ''}
-                            ${weather.temp ? weather.temp : 'Weather unavailable'}
+                            ${icon ? `<img src="${icon}" alt="Weather icon" />` : ''}
+                            ${temp}
                         </div>
                     `;
                     timezonesContainer.appendChild(timezoneElement);
                 });
             }
 
-            // Fetch weather data for all cities
+            // Fetch weather data for all cities in both metric and imperial
             async function fetchWeatherForCities() {
                 for (const timezone of config.timezones) {
                     const cityName = timezone.name.split('/').pop().replace('_', ' ');
-                    const weather = await fetchWeather(cityName, timezone.metric);
+                    const weather = await fetchWeather(cityName);
                     weatherData[cityName] = weather;
                 }
             }
 
-            async function fetchWeather(cityName, metric) {
+            async function fetchWeather(cityName) {
                 try {
-                    const response = await fetch(
-                        `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=${metric}`
+                    const metricResponse = await fetch(
+                        `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=metric`
                     );
-                    if (response.ok) {
-                        const data = await response.json();
-                        const unit = metric === 'metric' ? '°C' : '°F';
+                    const imperialResponse = await fetch(
+                        `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=imperial`
+                    );
+
+                    if (metricResponse.ok && imperialResponse.ok) {
+                        const metricData = await metricResponse.json();
+                        const imperialData = await imperialResponse.json();
                         return {
-                            icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
-                            temp: `${data.main.temp}${unit}`
+                            icon: `https://openweathermap.org/img/wn/${metricData.weather[0].icon}@2x.png`,
+                            metric: { temp: `${metricData.main.temp}°C` },
+                            imperial: { temp: `${imperialData.main.temp}°F` }
                         };
                     }
-                    return { icon: null, temp: 'Weather unavailable' };
+                    return { icon: null, metric: { temp: 'Unavailable' }, imperial: { temp: 'Unavailable' } };
                 } catch (err) {
                     console.error(`Error fetching weather for ${cityName}:`, err);
-                    return { icon: null, temp: 'Weather unavailable' };
+                    return { icon: null, metric: { temp: 'Unavailable' }, imperial: { temp: 'Unavailable' } };
                 }
             }
 
@@ -205,8 +220,11 @@ document.addEventListener('DOMContentLoaded', () => {
             await fetchWeatherForCities();
             setInterval(fetchWeatherForCities, 3600000); // Update weather every hour
 
-            // Update the time zones every 10 seconds
-            setInterval(updateTimezones, 10000);
+            // Update time zones and switch temperature units every 5 seconds
+            setInterval(() => {
+                showMetric = !showMetric; // Toggle between metric and imperial
+                updateTimezones();
+            }, 5000);
 
             // Set initial display of timer on page load
             updateInitialTimerDisplay();

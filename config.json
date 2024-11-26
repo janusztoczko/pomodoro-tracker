@@ -1,9 +1,9 @@
 {
   "timezones": [
     { "name": "Asia/Tokyo", "metric": "metric" },
-    { "name": "America/Los_Angeles", "metric": "imperial" },
-    { "name": "America/Chicago", "metric": "imperial" },
-    { "name": "America/New_York", "metric": "imperial" },
+    { "name": "America/Los_Angeles", "metric": "metric" },
+    { "name": "America/Chicago", "metric": "metric" },
+    { "name": "America/New_York", "metric": "metric" },
     { "name": "America/Argentina/Buenos_Aires", "metric": "metric" },
     { "name": "Europe/London", "metric": "metric" },
     { "name": "Europe/Warsaw", "metric": "metric" },
