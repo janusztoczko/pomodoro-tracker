@@ -231,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setCssVariables(config);
 
             timerElement.addEventListener('click', toggleTimer);
+            toggleTimer();
         })
         .catch(err => console.error('Error loading config:', err));
 });
