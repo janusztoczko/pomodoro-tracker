@@ -27,10 +27,10 @@
   },
   "discordWebhookUrl": "https://discord.com/api/webhooks/",
   "discordWebhookPayload": {
-    "Pomodoro started": {
+    "Pomodoro": {
         "embeds": [
             {
-            "title": "Pomodoro started!",
+            "title": "Pomodoro {sessionCount} started!",
             "description": "Time to focus!",
             "color": 16711680
             }

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
         return params.get('weatherApiKey');
     }
+
     function getDiscordWebhookPass() {
         const params = new URLSearchParams(window.location.search);
         return params.get('discordWebhookPass');
@@ -20,11 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const circumference = 2 * Math.PI * radius;
 
             const API_KEY = getApiKeyFromUrl(); // Get API key from URL
-
-            if (!API_KEY) {
-                console.error('Weather API key is missing in the URL. Add ?weatherApiKey=YOUR_KEY to the URL.');
-                return;
-            }
 
             circle.style.strokeDasharray = `${circumference} ${circumference}`;
             circle.style.strokeDashoffset = circumference;
@@ -76,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             function startTimer() {
                 const endTime = Date.now() + duration * 1000;
                 updateSessionTypeDisplay();
+                sendWebhook(currentType, sessionCount+1);
                 totalDuration = duration;
 
                 interval = setInterval(() => {
@@ -85,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (remaining <= 0) {
                         clearInterval(interval);
                         isRunning = false;
-                        sendWebhook(currentType);
                         if (currentType === 'Pomodoro') {
                             sessionCount++;
                         }
@@ -103,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     isRunning = false;
                 } else {
                     isRunning = true;
-                    sendWebhook(`${currentType} started`);
                     startTimer();
                 }
             }
@@ -133,19 +128,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            function sendWebhook(currentType) {
-                if(getDiscordWebhookPass()){
+            function sendWebhook(currentType, counter) {
+                if (getDiscordWebhookPass()) {
                     const url = config.discordWebhookUrl + getDiscordWebhookPass();
 
                     fetch(url, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body:
-                            JSON.stringify(config.discordWebhookPayload[currentType])
+                            JSON.stringify(
+                                config.discordWebhookPayload[currentType]
+                            ).replace('{sessionCount}', '#' + counter)
                     });
                 }
-
-
             }
 
             // Function to display current time for each time zone
@@ -165,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ? showMetric
                             ? weather.metric.temp
                             : weather.imperial.temp
-                        : 'Fetching...';
+                        : '';
 
                     const icon = weather ? weather.icon : '';
 
@@ -185,10 +180,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Fetch weather data for all cities in both metric and imperial
             async function fetchWeatherForCities() {
-                for (const timezone of config.timezones) {
-                    const cityName = timezone.name.split('/').pop().replace('_', ' ');
-                    const weather = await fetchWeather(cityName);
-                    weatherData[cityName] = weather;
+                if (getApiKeyFromUrl()) {
+                    for (const timezone of config.timezones) {
+                        const cityName = timezone.name.split('/').pop().replace('_', ' ');
+                        const weather = await fetchWeather(cityName);
+                        weatherData[cityName] = weather;
+                    }
                 }
             }
 
@@ -235,4 +232,40 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleTimer();
         })
         .catch(err => console.error('Error loading config:', err));
+});
+
+// JavaScript logic to handle showing and hiding the modal, and saving form data to local storage
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('config-modal');
+    const openModalButton = document.getElementById('open-modal'); // Add a button with this ID to open the modal
+    const closeModalButton = document.getElementById('close-modal');
+    const saveConfigButton = document.getElementById('save-config');
+    const cancelConfigButton = document.getElementById('cancel-config');
+    const configForm = document.getElementById('config-form');
+
+    // Function to show the modal
+    function showModal() {
+        modal.classList.add('is-active');
+    }
+
+    // Function to hide the modal
+    function hideModal() {
+        modal.classList.remove('is-active');
+    }
+
+    // Function to save form data to local storage
+    function saveConfig(event) {
+        event.preventDefault();
+        const formData = new FormData(configForm);
+        formData.forEach((value, key) => {
+            localStorage.setItem(key, value);
+        });
+        hideModal();
+    }
+
+    // Event listeners
+    openModalButton.addEventListener('click', showModal);
+    closeModalButton.addEventListener('click', hideModal);
+    cancelConfigButton.addEventListener('click', hideModal);
+    saveConfigButton.addEventListener('click', saveConfig);
 });

@@ -95,3 +95,18 @@ h2 {
     transition: stroke-dashoffset 0.35s;
     stroke-linecap: round;
 }
+
+#open-modal{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 1rem;
+    cursor: pointer;
+    width: 40px;
+    height:40px;
+    background: url('/assets/gear.svg') no-repeat;
+    background-size: cover;
+    font-size:0;
+    border:0;
+    outline:0;
+}

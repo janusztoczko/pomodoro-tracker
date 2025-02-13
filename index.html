@@ -26,6 +26,102 @@
                 </div>
             </div>
         </div>
+        <div class="modal" id="config-modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Timer Configuration</p>
+                    <button class="delete" id="close-modal" aria-label="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <form id="config-form">
+                        <fieldset>
+                            <legend>Rocket Chat</legend>
+                            <div class="field">
+                                <label class="label">X-User-Id</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="rocket-user-id" name="rocketUserId">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">X-Auth-Token</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="rocket-auth-token" name="rocketAuthToken">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Discord</legend>
+                            <div class="field">
+                                <label class="label">Webhook URL</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="discord-webhook-url" name="discordWebhookUrl">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Webhook Pass</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="discord-webhook-pass" name="discordWebhookPass">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Pomodoro</legend>
+                            <div class="field">
+                                <label class="label">Pomodoro Duration (minutes)</label>
+                                <div class="control">
+                                    <input class="input" type="number" id="pomodoro-duration" name="pomodoroDuration">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Long Break Duration (minutes)</label>
+                                <div class="control">
+                                    <input class="input" type="number" id="long-break-duration" name="longBreakDuration">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Short Break Duration (minutes)</label>
+                                <div class="control">
+                                    <input class="input" type="number" id="short-break-duration" name="shortBreakDuration">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Break Interval</label>
+                                <div class="control">
+                                    <input class="input" type="number" id="break-interval" name="breakInterval">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Look'n'Feel</legend>
+                            <div class="field">
+                                <label class="label">Background Image URL</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="background-image-url" name="backgroundImageUrl">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Pomodoro Start Sound</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="pomodoro-start-sound" name="pomodoroStartSound">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Break Start Sound</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="break-start-sound" name="breakStartSound">
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-success" id="save-config">Save changes</button>
+                    <button class="button" id="cancel-config">Cancel</button>
+                </footer>
+            </div>
+        </div>
+        <button id="open-modal" class="button is-primary">Configure</button>
     </section>
     <script src="config.json" type="application/json"></script>
     <script src="script.js"></script>
