@@ -25,9 +25,35 @@
     "quaternary": "#23d160",
     "quinary": "#ff3860"
   },
-  "webhooks": {
-    "startPomodoro": ["https://example.com/start-pomodoro"],
-    "startBreak": ["https://example.com/start-break"],
-    "endSession": ["https://example.com/end-session"]
-  }
+  "discordWebhookUrl": "https://discord.com/api/webhooks/",
+  "discordWebhookPayload": {
+    "Pomodoro started": {
+        "embeds": [
+            {
+            "title": "Pomodoro started!",
+            "description": "Time to focus!",
+            "color": 16711680
+            }
+        ]
+    },
+    "Short Break": {
+        "embeds": [
+            {
+            "title": "Short break started!",
+            "description": "Time to relax!",
+            "color": 65280
+            }
+        ]
+    },
+    "Long Break": {
+        "embeds": [
+            {
+            "title": "Long break started!",
+            "description": "Time to relax!",
+            "color": 16776960
+            }
+        ]
+    }
+  },
+  "rocketChatWebhookUrl": "https://rocketchat.com/api/webhooks/"
 }

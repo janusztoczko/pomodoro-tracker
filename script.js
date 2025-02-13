@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
         return params.get('weatherApiKey');
     }
+    function getDiscordWebhookPass() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('discordWebhookPass');
+    }
 
     fetch('config.json')
         .then(response => response.json())
@@ -81,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (remaining <= 0) {
                         clearInterval(interval);
                         isRunning = false;
-                        sendWebhook(currentType === 'Pomodoro' ? 'Pomodoro finished' : 'Break finished');
+                        sendWebhook(currentType);
                         if (currentType === 'Pomodoro') {
                             sessionCount++;
                         }
@@ -129,22 +133,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            function sendWebhook(message) {
-                const webhookKey = currentType === 'Pomodoro' ? 'startPomodoro' : 'startBreak';
-                const urls = config.webhooks[webhookKey] || config.webhooks.endSession;
+            function sendWebhook(currentType) {
+                if(getDiscordWebhookPass()){
+                    const url = config.discordWebhookUrl + getDiscordWebhookPass();
 
-                if (urls) {
-                    urls.forEach(url => {
-                        fetch(url, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                message: message,
-                                timestamp: new Date().toISOString()
-                            })
-                        });
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body:
+                            JSON.stringify(config.discordWebhookPayload[currentType])
                     });
                 }
+
+
             }
 
             // Function to display current time for each time zone
@@ -205,14 +206,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         const imperialData = await imperialResponse.json();
                         return {
                             icon: `https://openweathermap.org/img/wn/${metricData.weather[0].icon}@2x.png`,
-                            metric: { temp: `${metricData.main.temp}°C` },
-                            imperial: { temp: `${imperialData.main.temp}°F` }
+                            metric: {temp: `${metricData.main.temp}°C`},
+                            imperial: {temp: `${imperialData.main.temp}°F`}
                         };
                     }
-                    return { icon: null, metric: { temp: 'Unavailable' }, imperial: { temp: 'Unavailable' } };
+                    return {icon: null, metric: {temp: 'Unavailable'}, imperial: {temp: 'Unavailable'}};
                 } catch (err) {
                     console.error(`Error fetching weather for ${cityName}:`, err);
-                    return { icon: null, metric: { temp: 'Unavailable' }, imperial: { temp: 'Unavailable' } };
+                    return {icon: null, metric: {temp: 'Unavailable'}, imperial: {temp: 'Unavailable'}};
                 }
             }
 
