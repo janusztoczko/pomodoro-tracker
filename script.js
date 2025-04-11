@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const [key, value] of Object.entries(config.colors)) {
                     root.style.setProperty(`--${key}`, value);
                 }
-                root.style.setProperty(`--backgroundImage`, config.backgroundImage);
+                //root.style.setProperty(`--backgroundImage`, config.backgroundImage);
             }
 
             function updateTimerDisplay(timeInSeconds) {

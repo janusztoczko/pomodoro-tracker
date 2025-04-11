@@ -20,7 +20,7 @@
   "backgroundImage": "url('assets/nightsky.jpg')",
   "colors": {
     "primary": "#ffffff",
-    "secondary": "#000000",
+    "secondary": "#383838",
     "tertiary": "#3273dc",
     "quaternary": "#23d160",
     "quinary": "#ff3860"
