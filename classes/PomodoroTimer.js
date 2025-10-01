@@ -20,6 +20,10 @@ export class PomodoroTimer {
         this.paused = false;
         this.pausedMode = this.cfg.startMode;
         this.sessionTime = 0;
+        
+        this.alarm = new Audio('./assets/alarm.mp3');
+        this.tick = new Audio('./assets/tick.mp3');
+        
         this.switchTheme();
     }
 
@@ -56,7 +60,6 @@ export class PomodoroTimer {
 
         this.interval = setInterval(() => {
             this.paused = false;
-
             this.sessionTime -= 1;
 
             let minutes = Math.floor(this.sessionTime / 60);
@@ -67,7 +70,9 @@ export class PomodoroTimer {
 
             this.updateTimer(progress, formatted)
 
+            this.tick.play();
             if (progress >= 100) {
+                this.alarm.play();
                 clearInterval(this.interval);
 
                 if (this.cfg.autoAdvance) {
@@ -81,7 +86,6 @@ export class PomodoroTimer {
                     } else {
                         this.sessionTimer('pomodoro');
                     }
-
                 }
             }
         }, 1000);
