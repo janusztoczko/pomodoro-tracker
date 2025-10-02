@@ -10,7 +10,7 @@ const timer = new PomodoroTimer(el, {
     shortBreak: 5,
     longBreak: 15,
     intervals: 4,
-    autoAdvance: false,
+    autoAdvance: true,
     autoStart: false,
     startMode: "pomodoro",
 });
