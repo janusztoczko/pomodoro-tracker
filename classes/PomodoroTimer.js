@@ -38,6 +38,8 @@ export class PomodoroTimer {
         switch (mode) {
             case "pomodoro":
                 window.document.title = '🍅 Focus time!';
+                this.tick.loop = true;
+                this.tick.play();
                 totalTime = this.cfg.pomodoro * 60;
                 if (!this.paused) {
                     this.sessionInterval += 1;
@@ -57,7 +59,6 @@ export class PomodoroTimer {
             this.sessionTime = totalTime;
         }
 
-
         this.interval = setInterval(() => {
             this.paused = false;
             this.sessionTime -= 1;
@@ -70,8 +71,8 @@ export class PomodoroTimer {
 
             this.updateTimer(progress, formatted)
 
-            this.tick.play();
             if (progress >= 100) {
+                this.tick.pause();
                 this.alarm.play();
                 clearInterval(this.interval);
 
@@ -93,12 +94,14 @@ export class PomodoroTimer {
 
     pauseTimer() {
         window.document.title = '🛑 Paused';
+        this.tick.pause();
         clearInterval(this.interval);
         this.paused = true;
     }
 
     stopTimer() {
         window.document.title = this.pageTitle;
+        this.tick.pause();
         clearInterval(this.interval);
         this.updateTimer(100, '00:00')
     }
