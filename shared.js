@@ -64,7 +64,7 @@ timer.on('stopped', () => {
     setStartState(false);
 });
 
-if(await fetch('/stream')){
+if(document.location.href.includes('discord')){
     updater = new Streamer(false,  '/stream' );
 }
 else{
