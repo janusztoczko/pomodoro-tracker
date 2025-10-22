@@ -106,8 +106,7 @@ timer.on('autoadvance', () => {
 console.log(cowork);
 if (hash || cowork === 'cowork') {
 
-    const updater = new Streamer(false, {sessionId: "justcowork", sessionUrl: (cowork === 'cowork' ? './rest/sessions/' : 'https://rest.justco.work/sessions/')});
-    document.querySelector('.stopwatch').innerHTML = (cowork === 'cowork' ? './rest/sessions/' : 'https://rest.justco.work/sessions/');
+    const updater = new Streamer(false, cowork === 'cowork' ? '/stream' : 'https://rest.justco.work/sessions/justcowork/stream');
     try {
         updater.events.addEventListener('snapshot', function (snapshot) {
             if (snapshot.type === 'snapshot') {
