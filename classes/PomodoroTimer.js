@@ -29,7 +29,6 @@ export default class PomodoroTimer {
             config
         );
 
-        // Internal state
         this.sessionInterval = 0;      // how many pomodoros completed in this cycle
         this._intervalId = null;       // setInterval id
         this.title = this.cfg.initialTitle;
@@ -45,9 +44,6 @@ export default class PomodoroTimer {
         }
     }
 
-    /* ===============================
-     * Event Emitter (simple & tiny)
-     * =============================== */
     on(event, handler) {
         if (!this._events.has(event)) this._events.set(event, new Set());
         this._events.get(event).add(handler);
@@ -70,11 +66,6 @@ export default class PomodoroTimer {
         }
     }
 
-    /* ===============================
-     * Public API
-     * =============================== */
-
-    /** Start (or restart) a session timer with a given mode */
     start(mode = this.cfg.startMode, timestamp = false) {
         if (this._pausedAt) {
             return this.resume();
