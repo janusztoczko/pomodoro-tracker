@@ -10,6 +10,7 @@ const volumeBtn = document.querySelector('.volume');
 let timerMode = 'single';
 const {hash} = document.location;
 const {body} = document;
+const cowork = document.body.getAttribute('data-mode');
 
 const tickAudio = new Audio('./assets/tick.mp3');
 const alarmAudio = new Audio('./assets/alarm.mp3');
@@ -102,9 +103,9 @@ timer.on('stopped', () => {
 timer.on('autoadvance', () => {
     setStartState(true); // still running after auto-advance
 });
-
-if (hash) {
-    const updater = new Streamer(false, {sessionId: hash.substring(1)});
+console.log(cowork);
+if (hash || cowork === 'cowork') {
+    const updater = new Streamer(false, {sessionId: "justcowork"});
 
     try {
         updater.events.addEventListener('snapshot', function (snapshot) {
