@@ -64,9 +64,6 @@ timer.on('stopped', () => {
     setStartState(false);
 });
 
-console.log(await fetch('/stream').then(res => res.status));
-console.log(await fetch('https://rest.justco.work/sessions/justcowork/stream'));
-
 if(await fetch('/stream')){
     updater = new Streamer(false,  '/stream' );
 }
