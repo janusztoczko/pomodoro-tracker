@@ -54,6 +54,7 @@ body {
 
         .stopwatch {
             display: flex;
+            position: relative;
             width: calc(var(--size-aspect) * .9);
             height: calc(var(--size-aspect) * .9);
             background: conic-gradient(
@@ -77,6 +78,13 @@ body {
                 align-items: center;
                 justify-content: center;
                 font-size: 4em;
+            }
+
+            &:before{
+                content: attr(data-mode);
+                color: var(--primary-color);
+                position: absolute;
+                top: calc(63%);
             }
         }
     }
@@ -117,6 +125,11 @@ body {
             right: calc(var(--size-aspect) * .05);
         }
 
+        &.volume{
+            top: calc(var(--size-aspect) * .05);
+            right: calc(var(--size-aspect) * .05);
+        }
+
         &.start{
             &:after{
                 content: '▶';
@@ -140,5 +153,22 @@ body {
                 content: '✎'
             }
         }
+
+        &.volume{
+            &:after{
+                content: '🔈';
+            }
+
+            &.mute{
+                &:after{
+                    content: '🔇';
+                }
+            }
+        }
+    }
+}
+.shared-session{
+    .is-single{
+        display:none!important;
     }
 }
