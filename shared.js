@@ -2,6 +2,7 @@ import PomodoroTimer from './classes/PomodoroTimer.js';
 import {Streamer} from './classes/Streamer.js';
 
 const stopwatchEl = document.querySelector('.stopwatch');
+const congratsEl = document.querySelector('.congrats');
 const themeBtn = document.querySelector('.theme');
 const volumeBtn = document.querySelector('.volume');
 const {body} = document;
@@ -16,16 +17,36 @@ function updateStopwatch(progressPct, formatted) {
     stopwatchEl.style.setProperty('--progress', `${Math.min(100, Math.max(0, progressPct))}%`);
 }
 
+function showClock() {
+    let now = new Date();
+    if ((now.getSeconds() > 10 && now.getSeconds() < 20) || (now.getSeconds()> 30 && now.getSeconds()<40)) {
+        stopwatchEl.setAttribute('data-mode', `${now.getHours()}:${now.getMinutes()}`);
+        return;
+    }
+    stopwatchEl.setAttribute('data-mode', stopwatchEl.getAttribute('data-mode-2'));
+}
+
+function showCongrats(mode = 'pomodoro'){
+    congratsEl.innerHTML = timer.sessionMode === 'pomodoro' ? 'Time to relax!' : 'Get ready!<sub>It\'s focus time!</sub>';
+    congratsEl.classList.remove('hidden');
+    setTimeout(() => {
+        congratsEl.classList.add('hidden');
+    }, 2000);
+}
+
 function setTheme(themeIdx) {
     body.className = '';
     body.classList.add(`theme-${themeIdx}`);
 }
 
 const timer = new PomodoroTimer({
-    initialTitle: document.title
+    initialTitle: document.title,
+    autoStart: false,
+    autoAdvance: false
 });
 timer.on('tick', ({progress, formatted}) => {
     updateStopwatch(progress, formatted);
+    showClock();
 });
 
 timer.on('title', (text) => {
@@ -34,66 +55,51 @@ timer.on('title', (text) => {
 
 timer.on('mode', (mode) => {
     stopwatchEl.setAttribute('data-mode', mode);
+    stopwatchEl.setAttribute('data-mode-2', mode);
 });
 
 timer.on('themechange', ({theme}) => {
     setTheme(theme);
 });
 
-timer.on('sound', ({type, action, volumeEnabled}) => {
-    // honor logical volume flag
-    tickAudio.muted = !volumeEnabled;
-    alarmAudio.muted = !volumeEnabled;
+timer.on('stopped', () => {
+    updateStopwatch(100, '00:00');
+});
 
-    if (type === 'tick') {
-        if (action === 'start') tickAudio.play().catch(() => {
+timer.on('completed', () => {
+    showCongrats();
+});
+
+
+if (document.location.href.includes('discord')) {
+    updater = new Streamer(false, '/stream');
+} else {
+    updater = new Streamer(false, 'https://rest.justco.work/sessions/justcowork/stream');
+}
+updater.events.addEventListener('snapshot', function (snapshot) {
+    if (snapshot.type === 'snapshot') {
+        const session = JSON.parse(snapshot.data).session;
+        timer.setConfig({
+            startMode: session.sessionMode,
+            sessionModeTimestamp: session.sessionModeTimestamp,
+            pomodoro: session.pomodoro,
+            pomodoroInterval: session.pomodoroInterval,
+            shortBreak: session.shortBreak,
+            longBreak: session.longBreak,
+            autoStart: session.autoStart,
+            paused: session.paused,
+            counter: session.counter,
+            remaining: session.remaining,
         });
-        if (action === 'stop') tickAudio.pause();
-    } else if (type === 'alarm') {
-        if (action === 'play') {
-            // play once
-            alarmAudio.currentTime = 0;
-            alarmAudio.play().catch(() => {
-            });
-        }
+        timer.start(session.sessionMode, session.sessionModeTimestamp);
     }
 });
 
-timer.on('stopped', () => {
-    updateStopwatch(100, '00:00');
-    setStartState(false);
+updater.events.addEventListener('update', function (event) {
+    let session = JSON.parse(event.data).session;
+    timer.start(session.sessionMode);
 });
 
-if(document.location.href.includes('discord')){
-    updater = new Streamer(false,  '/stream' );
-}
-else{
-    updater = new Streamer(false,  'https://rest.justco.work/sessions/justcowork/stream' );
-}
-
-try {
-    updater.events.addEventListener('snapshot', function (snapshot) {
-        if (snapshot.type === 'snapshot') {
-
-            const shared = JSON.parse(snapshot.data).session;
-            // Push mode/timestamp into timer config so external consumers can read it if needed
-            timer.setConfig({
-                startMode: shared.sessionMode,
-                sessionModeTimestamp: shared.sessionModeTimestamp
-            });
-            timer.start(shared.sessionMode, shared.sessionModeTimestamp);
-        }
-    });
-
-    updater.events.addEventListener('update', function (event) {
-        let session = JSON.parse(event.data).session;
-        timer.start(session.sessionMode);
-
-    });
-} catch (err) {
-    showControls();
-    console.log(err);
-}
 
 themeBtn.addEventListener('click', () => {
     timer.switchTheme();

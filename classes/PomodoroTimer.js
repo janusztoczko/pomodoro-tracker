@@ -144,10 +144,9 @@ export default class PomodoroTimer {
 
     /** Manually switch theme (purely logical). UI can listen and apply styles. */
     switchTheme() {
-        if (this.cfg.theme > 7) this.cfg.theme = 1;
-        const current = this.cfg.theme;
+        if (this.cfg.theme >= 7) this.cfg.theme = 0;
         this.cfg.theme++;
-        this._emit("themechange", {theme: current});
+        this._emit("themechange", {theme: this.cfg.theme});
     }
 
     /** Logical volume toggle (UI can honor this when playing sounds). */
@@ -206,6 +205,8 @@ export default class PomodoroTimer {
             if (this.sessionMode === "pomodoro") {
                 this.sessionInterval += 1;
             }
+            
+            this._emit("completed", {sessionMode: this.sessionMode});
 
             // auto-advance if enabled
             if (this.cfg.autoAdvance) {
