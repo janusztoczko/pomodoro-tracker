@@ -20,7 +20,7 @@ function updateStopwatch(progressPct, formatted) {
 function showClock() {
     let now = new Date();
     if ((now.getSeconds() > 10 && now.getSeconds() < 20) || (now.getSeconds()> 30 && now.getSeconds()<40)) {
-        stopwatchEl.setAttribute('data-mode', `${now.getHours()}:${now.getMinutes()}`);
+        stopwatchEl.setAttribute('data-mode', `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
         return;
     }
     stopwatchEl.setAttribute('data-mode', stopwatchEl.getAttribute('data-mode-2'));
