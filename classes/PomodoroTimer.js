@@ -83,10 +83,12 @@ export default class PomodoroTimer {
             this._remaining = parseInt(total - ((Date.now() - timestamp) / 1000));
         } else {
             this._remaining = total;
+            this.cfg.sessionModeTimestamp = Date.now();
+            this.sessionModeTimestamp = Date.now();
         }
-
-        this.cfg.sessionModeTimestamp = Date.now();
-        this.sessionModeTimestamp = Date.now();
+        
+        console.log(this._remaining);
+        
 
         this.modeLabel(mode);
 
@@ -151,6 +153,8 @@ export default class PomodoroTimer {
     /** Logical volume toggle (UI can honor this when playing sounds). */
     toggleVolume() {
         this._volumeEnabled = !this._volumeEnabled;
+        if(this._volumeEnabled) this.emitSound("tick", "start");
+        if(!this._volumeEnabled) this.emitSound("tick", "stop");
         this._emit("volumechange", {enabled: this._volumeEnabled});
     }
 
