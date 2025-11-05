@@ -17,25 +17,38 @@ body {
     background-position: center;
     font-size: calc(var(--size-aspect) * .05);
 
-    &.theme-1{
+    *:focus, *:active {
+        outline: none !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        border-image-width: 0 !important;
+    }
+
+    &.theme-1 {
         background-image: url('/assets/corridor.jpg');
     }
-    &.theme-2{
+
+    &.theme-2 {
         background-image: url('/assets/nightsky.jpg');
     }
-    &.theme-3{
+
+    &.theme-3 {
         background-image: url('/assets/water.jpg');
     }
-    &.theme-4{
+
+    &.theme-4 {
         background-image: url('/assets/blue-lake.jpg');
     }
-    &.theme-5{
+
+    &.theme-5 {
         background-image: url('/assets/island.jpg');
     }
-    &.theme-6{
+
+    &.theme-6 {
         background-image: url('/assets/fields.jpg');
     }
-    &.theme-7{
+
+    &.theme-7 {
         background-image: url('/assets/valley.jpg');
     }
 
@@ -80,7 +93,7 @@ body {
                 font-size: 4em;
             }
 
-            &:before{
+            &:before {
                 content: attr(data-mode);
                 color: var(--primary-color);
                 position: absolute;
@@ -89,109 +102,87 @@ body {
         }
     }
 
-    .button{
+    .button {
         position: absolute;
-        padding:0;
-        margin:0;
+        padding: 0;
+        margin: 0;
         width: calc(var(--size-aspect) * .08);
         height: calc(var(--size-aspect) * .08);
+        outline: none;
+        box-shadow: none;
+        border: 0;
 
-        &:after{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: inherit;
-            height:inherit;
-            font-size: calc(var(--size-aspect) * .05);
+        i{
+            font-size: calc(var(--size-aspect) * .037);
         }
 
-        span{
-            display:none;
+        span {
+            display: none;
         }
 
         &.start,
-        &.pause{
+        &.pause {
             top: calc(var(--size-aspect) * .05);
             left: calc(var(--size-aspect) * .05);
         }
 
-        &.stop{
+        &.stop {
             top: calc(var(--size-aspect) * .15);
             left: calc(var(--size-aspect) * .05);
         }
 
-        &.theme{
+        &.theme {
             bottom: calc(var(--size-aspect) * .05);
             right: calc(var(--size-aspect) * .05);
         }
 
-        &.volume{
+        &.volume {
             top: calc(var(--size-aspect) * .05);
             right: calc(var(--size-aspect) * .05);
         }
 
-        &.start{
-            &:after{
-                content: '▶';
-            }
+        &.alarm {
+            top: calc(var(--size-aspect) * .15);
+            right: calc(var(--size-aspect) * .05);
         }
 
-        &.stop{
-            &:after{
-                content: '⏹';
-            }
-        }
-
-        &.pause{
-            &:after{
-                content: '⏸';
-            }
-        }
-
-        &.theme{
-            &:after{
-                content: '✎'
-            }
-        }
-
-        &.volume{
-            &:after{
-                content: '🔈';
-            }
-
-            &.mute{
-                &:after{
-                    content: '🔇';
+        &.volume, &.alarm {
+            &.mute {
+                opacity: 0.6;
+                i {
+                    color: lightgray;
                 }
             }
         }
     }
-    .congrats{
-        opacity:1;
+
+    .congrats {
+        opacity: 1;
         transition: opacity .5s;
         display: flex;
         flex-direction: column;
         position: absolute;
         width: calc(var(--size-aspect) * .9);
         height: calc(var(--size-aspect) * .9);
-        background-color:white;
+        background-color: white;
         border-radius: 50%;
         justify-content: center;
         align-items: center;
         font-size: calc(var(--size-aspect) * .05);
         cursor: pointer;
 
-        sub{
-           font-size: calc(var(--size-aspect) * .03);
+        sub {
+            font-size: calc(var(--size-aspect) * .03);
         }
 
-        &.hidden{
-            opacity:0;
+        &.hidden {
+            opacity: 0;
         }
     }
 }
-.shared-session{
-    .is-single{
-        display:none!important;
+
+.shared-session {
+    .is-single {
+        display: none !important;
     }
 }

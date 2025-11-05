@@ -1,18 +1,9 @@
-// Headless PomodoroTimer (no DOM, no Audio)
-// Usage:
-// const t = new PomodoroTimer({ autoStart: true });
-// t.on('tick', ({ progress, formatted, remaining, total, mode }) => { /* update UI */ });
-// t.on('modechange', ({ mode, sessionInterval }) => { /* change labels */ });
-// t.on('title', (text) => { /* set document.title if you want */ });
-// t.on('sound', ({ type, action }) => { /* play/pause sounds in UI if desired */ });
-
 export default class PomodoroTimer {
-    constructor(config = {}) {
-        // Event listeners map
+    constructor(config = {}, session = {}) {
         this._events = new Map();
+        this.intervalId = null;
 
-        // Config (minutes for durations)
-        this.cfg = Object.assign(
+        this.config = Object.assign(
             {
                 pomodoro: 25,
                 shortBreak: 5,
@@ -20,27 +11,25 @@ export default class PomodoroTimer {
                 intervals: 4,
                 autoAdvance: true,
                 autoStart: false,
-                startMode: "pomodoro", // "pomodoro" | "shortBreak" | "longBreak"
-                theme: 1,
-                sessionModeTimestamp: false, // when the mode/timer last began
-                initialTitle: "Pomodoro Timer", // used on stop
-                initialLabel: "Ready?",
+                startMode: "pomodoro",
             },
             config
         );
 
-        this.sessionInterval = 0;      // how many pomodoros completed in this cycle
-        this._intervalId = null;       // setInterval id
-        this.title = this.cfg.initialTitle;
+        this.session = Object.assign(
+            {
+                sessionMode: this.config.startMode,
+                sessionInterval: 0,
+                pausedAt: null,
+                remaining: 0,
+                totalTime: 0,
+                sessionModeTimestamp: null,
+            },
+            session
+        );
 
-        this.sessionMode = this.cfg.startMode;
-        this._totalTime = 0;           // seconds for current mode
-        this._remaining = 0;           // seconds remaining
-        this._pausedAt = false;        // timestamp when paused (number) or false
-        this._volumeEnabled = true;    // logical volume toggle (for UI to honor)
-
-        if (this.cfg.autoStart) {
-            this.start(this.sessionMode);
+        if (this.config.autoStart) {
+            this.start(this.config.startMode);
         }
     }
 
@@ -66,153 +55,93 @@ export default class PomodoroTimer {
         }
     }
 
-    start(mode = this.cfg.startMode, timestamp = false) {
-        if (this._pausedAt) {
+    start(mode = this.session.sessionMode, timestamp = false) {
+        if (this.session.pausedAt) {
             return this.resume();
         }
 
-        this.sessionMode = mode;
-        this._setTitle(this._modeTitle(mode));
-        this.modeLabel(mode);
+        this.session.sessionMode = mode;
 
-        if (mode === "pomodoro") this.emitSound("tick", "start");
+        this._emit('start', {mode: this.session.sessionMode});
 
-        const total = this._modeToSeconds(mode);
-        this._totalTime = total;
+        this.session.totalTime = this._modeToSeconds(this.session.sessionMode);
         if (timestamp) {
-            this._remaining = parseInt(total - ((Date.now() - timestamp) / 1000));
+            this.session.remaining = parseInt(this.session.totalTime - ((Date.now() - timestamp) / 1000));
         } else {
-            this._remaining = total;
-            this.cfg.sessionModeTimestamp = Date.now();
-            this.sessionModeTimestamp = Date.now();
+            this.session.remaining = this.session.totalTime;
+            this.session.sessionModeTimestamp = Date.now();
         }
-        
-        console.log(this._remaining);
-        
-
-        this.modeLabel(mode);
 
         this._clearInterval();
-        this._intervalId = setInterval(() => this._tick(), 1000);
+        this.intervalId = setInterval(() => this._tick(), 1000);
     }
 
-    /** Pause the timer (idempotent). */
     pause() {
-        if (!this._intervalId || this._pausedAt) return;
-        this._pausedAt = Date.now();
-        this._setTitle("🛑 Paused");
-        // stop ticking sound
-        this.cfg.paused = Date.now();
-        if (this.sessionMode === "pomodoro") this.emitSound("tick", "stop");
+        if (!this.intervalId || this.session.pausedAt) return;
+        this.session.pausedAt = Date.now();
         this._clearInterval();
-        this._emit("paused", {mode: this.sessionMode, remaining: this._remaining});
+        this._emit("paused", {mode: this.session.sessionMode, remaining: this.session.remaining});
     }
 
-    /** Resume if paused. */
     resume() {
-        if (!this._pausedAt) return;
-        this._pausedAt = false;
-        this._setTitle(this._modeTitle(this.sessionMode));
-        this.modeLabel(this.sessionMode);
-        // resume ticking sound if pomodoro
-        if (this.sessionMode === "pomodoro") this.emitSound("tick", "start");
-        this.cfg.sessionModeTimestamp = Date.now();
+        if (!this.session.pausedAt) return;
+        this.session.pausedAt = false;
+        this.session.sessionModeTimestamp = Date.now();
         this._clearInterval();
-        this._intervalId = setInterval(() => this._tick(), 1000);
-        this._emit("resumed", {mode: this.sessionMode, remaining: this._remaining});
+        this.intervalId = setInterval(() => this._tick(), 1000);
+        this._emit("resumed", {mode: this.session.sessionMode, remaining: this.session.remaining});
     }
 
-    /** Stop timer and reset state (idempotent). */
     stop() {
-        this._setTitle(this.cfg.initialTitle);
-        this.modeLabel(false);
-        // stop any sounds
-        this.emitSound("tick", "stop");
         this._clearInterval();
-        this._remaining = 0;
-        this._pausedAt = false;
-        this.cfg.sessionModeTimestamp = false;
-        this.sessionMode = this.cfg.startMode;
+        this.session.remaining = 0;
+        this.session.pausedAt = false;
+        this.session.sessionModeTimestamp = false;
+        this.session.sessionMode = this.config.startMode;
         this.sessionInterval = 0;
 
-        // Emit a final tick update with 00:00 so UIs can reset
-        this._emitTick(1, 0, this._totalTime, this.sessionMode);
+        this._emitTick(1, 0, this.session.totalTime, this.session.sessionMode);
         this._emit("stopped", {});
-
-        // Reset sessionInterval cycle if desired; leaving as-is so UI can decide.
     }
 
-    /** Manually switch theme (purely logical). UI can listen and apply styles. */
-    switchTheme() {
-        if (this.cfg.theme >= 7) this.cfg.theme = 0;
-        this.cfg.theme++;
-        this._emit("themechange", {theme: this.cfg.theme});
-    }
-
-    /** Logical volume toggle (UI can honor this when playing sounds). */
-    toggleVolume() {
-        this._volumeEnabled = !this._volumeEnabled;
-        if(this._volumeEnabled) this.emitSound("tick", "start");
-        if(!this._volumeEnabled) this.emitSound("tick", "stop");
-        this._emit("volumechange", {enabled: this._volumeEnabled});
-    }
-
-    /** Update part of the config on the fly. */
     setConfig(patch = {}) {
-        Object.assign(this.cfg, patch);
-        this._emit("config", {cfg: {...this.cfg}});
+        Object.assign(this.config, patch);
+        this._emit("config", {config: {...this.config}});
+    }
+    
+    setSession(patch = {}) {
+        Object.assign(this.session, patch);
+        this._emit("session", {session: {...this.session}});
     }
 
-    /** Get current public state snapshot (useful for UI bootstrapping). */
     getState() {
         return {
-            mode: this.sessionMode,
-            sessionInterval: this.sessionInterval,
-            total: this._totalTime,
-            remaining: this._remaining,
-            paused: Boolean(this._pausedAt),
-            title: this.title,
-            theme: this.cfg.theme,
-            volumeEnabled: this._volumeEnabled,
-            config: {...this.cfg}
+            session: {...this.session},
+            config: {...this.config}
         };
     }
 
-    /* ===============================
-     * Internals
-     * =============================== */
-
     _tick() {
-        // ensure we're “running”
-        if (!this._intervalId) return;
+        if (!this.intervalId) return;
 
-        // tick
-        this._remaining = Math.max(0, this._remaining - 1);
+        this.session.remaining = Math.max(0, this.session.remaining - 1);
 
-        const progress = (this._totalTime - this._remaining) / this._totalTime;
-        this._emitTick(progress, this._remaining, this._totalTime, this.sessionMode);
+        const progress = (this.session.totalTime - this.session.remaining) / this.session.totalTime;
+        this._emitTick(progress, this.session.remaining, this.session.totalTime, this.session.sessionMode);
 
-        // completion
-        if (this._remaining <= 0) {
-            // stop tick sound
-            if (this.sessionMode === "pomodoro") this.emitSound("tick", "stop");
-
-            // play alarm once
-            this.emitSound("alarm", "play");
-
+        if (this.session.remaining <= 0) {
             this._clearInterval();
 
-            if (this.sessionMode === "pomodoro") {
-                this.sessionInterval += 1;
+            if (this.session.sessionMode === "pomodoro") {
+                this.session.sessionInterval += 1;
             }
-            
-            this._emit("completed", {sessionMode: this.sessionMode});
 
-            // auto-advance if enabled
-            if (this.cfg.autoAdvance) {
-                const next = this._nextMode(this.sessionMode);
-                this._emit("autoadvance", {from: this.sessionMode, to: next});
+            this._emit("completed", {sessionMode: this.session.sessionMode});
+
+            if (this.config.autoAdvance) {
+                const next = this._nextMode(this.session.sessionMode);
                 this.start(next);
+                this._emit("autoadvance", {from: this.session.sessionMode, to: next});
             }
         }
     }
@@ -235,8 +164,8 @@ export default class PomodoroTimer {
 
     _nextMode(current) {
         if (current === "pomodoro") {
-            if (this.sessionInterval >= this.cfg.intervals) {
-                this.sessionInterval = 0; // reset cycle after long break
+            if (this.session.sessionInterval >= this.config.intervals) {
+                this.session.sessionInterval = 0;
                 return "longBreak";
             }
             return "shortBreak";
@@ -247,59 +176,20 @@ export default class PomodoroTimer {
     _modeToSeconds(mode) {
         switch (mode) {
             case "pomodoro":
-                return this.cfg.pomodoro * 60;
+                return this.config.pomodoro * 60;
             case "shortBreak":
-                return this.cfg.shortBreak * 60;
+                return this.config.shortBreak * 60;
             case "longBreak":
-                return this.cfg.longBreak * 60;
+                return this.config.longBreak * 60;
             default:
-                return this.cfg.pomodoro * 60;
+                return this.config.pomodoro * 60;
         }
-    }
-
-    _modeTitle(mode) {
-        switch (mode) {
-            case "pomodoro":
-                return "🍅 Focus time!";
-            case "shortBreak":
-                return "⏱️ Short break";
-            case "longBreak":
-                return "☕️ Long break";
-            default:
-                return this.cfg.initialTitle;
-        }
-    }
-
-    modeLabel(mode) {
-        switch (mode) {
-            case "pomodoro":
-                this._emit("mode", "Pomodoro");
-                return;
-            case "shortBreak":
-                this._emit("mode", "Short Break");
-                return;
-            case "longBreak":
-                this._emit("mode", "Long Break");
-                return;
-            default:
-                this._emit("mode", this.cfg.initialLabel);
-                return;
-        }
-    }
-
-    _setTitle(text) {
-        this.title = text;
-        this._emit("title", text);
-    }
-
-    emitSound(type, action) {
-        this._emit("sound", {type, action, volumeEnabled: this._volumeEnabled});
     }
 
     _clearInterval() {
-        if (this._intervalId) {
-            clearInterval(this._intervalId);
-            this._intervalId = null;
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
         }
     }
 }

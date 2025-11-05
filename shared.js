@@ -1,110 +1,115 @@
 import PomodoroTimer from './classes/PomodoroTimer.js';
-import {Streamer} from './classes/Streamer.js';
+import Ui from './classes/Ui.js';
+import Streamer from './classes/Streamer.js';
 
-const stopwatchEl = document.querySelector('.stopwatch');
-const congratsEl = document.querySelector('.congrats');
-const themeBtn = document.querySelector('.theme');
-const volumeBtn = document.querySelector('.volume');
-const {body} = document;
-const tickAudio = new Audio('./assets/tick.mp3');
-const alarmAudio = new Audio('./assets/alarm.mp3');
-tickAudio.loop = true;
 let updater;
 
+const timer = new PomodoroTimer({
+    autoAdvance: false,
+});
 
-function updateStopwatch(progressPct, formatted) {
-    stopwatchEl.setAttribute('data-progress', formatted);
-    stopwatchEl.style.setProperty('--progress', `${Math.min(100, Math.max(0, progressPct))}%`);
-}
+const ui = new Ui({
+    initialTitle: document.title,
+});
 
-function showClock() {
-    let now = new Date();
-    if ((now.getSeconds() > 10 && now.getSeconds() < 20) || (now.getSeconds()> 30 && now.getSeconds()<40)) {
-        stopwatchEl.setAttribute('data-mode', `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
+
+timer.on('start', (handler) => {
+    if(timer.session.sessionModeTimestamp){
+        ui.setTitle(timer.session.sessionMode);
+        ui.modeLabel(timer.session.sessionMode);
+        if(handler.mode === 'pomodoro'){
+            ui.startTickingSound();
+        }
         return;
     }
-    stopwatchEl.setAttribute('data-mode', stopwatchEl.getAttribute('data-mode-2'));
-}
-
-function showCongrats(mode = 'pomodoro'){
-    congratsEl.innerHTML = timer.sessionMode === 'pomodoro' ? 'Time to relax!' : 'Get ready!<sub>It\'s focus time!</sub>';
-    congratsEl.classList.remove('hidden');
-    setTimeout(() => {
-        congratsEl.classList.add('hidden');
-    }, 2000);
-}
-
-function setTheme(themeIdx) {
-    body.className = '';
-    body.classList.add(`theme-${themeIdx}`);
-}
-
-const timer = new PomodoroTimer({
-    initialTitle: document.title,
-    autoStart: false,
-    autoAdvance: false
+    
+    timer.stop();
 });
+
 timer.on('tick', ({progress, formatted}) => {
-    updateStopwatch(progress, formatted);
-    showClock();
-});
-
-timer.on('title', (text) => {
-    document.title = text;
+    ui.updateStopwatch(progress, formatted);
 });
 
 timer.on('mode', (mode) => {
-    stopwatchEl.setAttribute('data-mode', mode);
-    stopwatchEl.setAttribute('data-mode-2', mode);
-});
-
-timer.on('themechange', ({theme}) => {
-    setTheme(theme);
+    ui.modeLabel(mode);
+    ui.setTitle(mode);
 });
 
 timer.on('stopped', () => {
-    updateStopwatch(100, '00:00');
+    ui.updateStopwatch(100, '00:00');
+    ui.modeLabel();
 });
 
 timer.on('completed', () => {
-    showCongrats();
+    ui.showCongrats(timer.session.sessionMode);
 });
 
+updater = new Streamer();
 
-if (document.location.href.includes('discord')) {
-    updater = new Streamer(false, '/stream');
-} else {
-    updater = new Streamer(false, 'https://rest.justco.work/sessions/justcowork/stream');
-}
-updater.events.addEventListener('snapshot', function (snapshot) {
-    if (snapshot.type === 'snapshot') {
-        const session = JSON.parse(snapshot.data).session;
-        timer.setConfig({
-            startMode: session.sessionMode,
-            sessionModeTimestamp: session.sessionModeTimestamp,
-            pomodoro: session.pomodoro,
-            pomodoroInterval: session.pomodoroInterval,
-            shortBreak: session.shortBreak,
-            longBreak: session.longBreak,
-            autoStart: session.autoStart,
-            paused: session.paused,
-            counter: session.counter,
-            remaining: session.remaining,
-        });
-        timer.start(session.sessionMode, session.sessionModeTimestamp);
+updater.on('snapshot', (session) => {
+    timer.setConfig({
+        startMode: session.sessionMode,
+        pomodoro: session.pomodoro,
+        shortBreak: session.shortBreak,
+        longBreak: session.longBreak,
+        intervals: session.intervals,
+        autoAdvance: false,
+    });
+    timer.setSession({
+        sessionMode: session.sessionMode,
+        sessionInterval: session.sessionInterval,
+        pausedAt: session.pausedAt,
+        remaining: session.remaining,
+        totalTime: session.totalTime,
+        sessionModeTimestamp: session.sessionModeTimestamp,
+
+    });
+    if(session.sessionModeTimestamp){
+        timer.start(timer.session.sessionMode, timer.session.sessionModeTimestamp);
+        ui.setTitle(timer.session.sessionMode);
+        ui.modeLabel(timer.session.sessionMode);
+        return;
     }
+    
+    ui.setTitle();
+    ui.modeLabel();
+
 });
 
-updater.events.addEventListener('update', function (event) {
-    let session = JSON.parse(event.data).session;
-    timer.start(session.sessionMode);
+updater.on('update', (update) => {
+    timer.setConfig({
+        startMode: update.sessionMode,
+        pomodoro: update.pomodoro,
+        shortBreak: update.shortBreak,
+        longBreak: update.longBreak,
+        intervals: update.intervals,
+        autoAdvance: false,
+    });
+    timer.setSession({
+        sessionMode: update.sessionMode,
+        sessionInterval: update.sessionInterval,
+        pausedAt: update.pausedAt,
+        remaining: update.remaining,
+        totalTime: update.totalTime,
+        sessionModeTimestamp: update.sessionModeTimestamp,
+    });
+    
+    if(update.pausedAt){
+        ui.showCongrats('pause');
+        timer.pause();
+        return;
+    }
+    
+    if(update.sessionModeTimestamp){
+        timer.start(update.sessionMode, update.sessionModeTimestamp);
+        ui.setTitle(update.sessionMode);
+        ui.modeLabel(update.sessionMode);
+        return;
+    }
+    
+    ui.showCongrats('stop');
+    timer.stop();
+    ui.setTitle();
+    ui.modeLabel();
 });
 
-
-themeBtn.addEventListener('click', () => {
-    timer.switchTheme();
-});
-volumeBtn.addEventListener('click', function () {
-    this.classList.toggle('mute');
-    timer.toggleVolume();
-});
