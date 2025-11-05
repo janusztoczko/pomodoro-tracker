@@ -4,6 +4,7 @@ export default class Ui {
 
         this.stopwatchEl = document.querySelector('.stopwatch');
         this.congratsEl = document.querySelector('.congrats');
+        this.clockEl = document.querySelector('.clock');
         this.themeBtn = document.querySelector('.theme');
         this.volumeBtn = document.querySelector('.volume');
         this.alarmBtn = document.querySelector('.alarm');
@@ -48,7 +49,6 @@ export default class Ui {
         this.switchTheme();
         this.setTitle(this.config.initialLabel);
         this.modeLabel(this.config.initialLabel);
-        this.showClock();
         
         this.tickAudio.muted = this.config.customization.ticking === '0';
         this.alarmAudio.muted = this.config.customization.alarm === '0';
@@ -75,6 +75,10 @@ export default class Ui {
                 self.alarmAudio.muted = this.classList.contains('mute');
             }
         )
+        
+        this.clockEl.addEventListener('click', () => {
+            this._emit('switch-timezone', ()=>{});
+        });
     }
 
     _emit(event, payload) {
@@ -86,6 +90,12 @@ export default class Ui {
             } catch {
             }
         }
+    }
+
+    on(event, handler) {
+        if (!this._events.has(event)) this._events.set(event, new Set());
+        this._events.get(event).add(handler);
+        return () => this.off(event, handler);
     }
 
     switchTheme() {
@@ -112,20 +122,12 @@ export default class Ui {
         this.stopwatchEl.setAttribute('data-progress', formatted);
         this.stopwatchEl.style.setProperty('--progress', `${Math.min(100, Math.max(0, progressPct))}%`);
     }
-
-    showClock() {
-        let now = new Date();
-        if ((now.getSeconds() > 10 && now.getSeconds() < 20) || (now.getSeconds() > 30 && now.getSeconds() < 40)) {
-            this.stopwatchEl.setAttribute('data-mode', `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
-            return;
-        }
-        this.stopwatchEl.setAttribute('data-mode', this.stopwatchEl.getAttribute('data-mode-default'));
+    
+    updateClock(time, timezone) {
+        this.clockEl.setAttribute('data-time', time);
+        this.clockEl.setAttribute('data-timezone', timezone);
     }
-
-    hideClock() {
-        this.stopwatchEl.setAttribute('data-mode', this.stopwatchEl.getAttribute('data-mode-default'));
-    }
-
+    
     showCongrats(mode = 'pomodoro') {
         this.congratsEl.innerHTML = this.config.modeCongrats[mode];
         this.congratsEl.classList.remove('hidden');
@@ -150,5 +152,4 @@ export default class Ui {
         this.tickAudio.pause();
         this.tickAudio.currentTime = 0;
     }
-
 }

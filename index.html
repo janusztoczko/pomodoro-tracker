@@ -14,19 +14,48 @@
     <time class="stopwatch" data-progress="00:00" data-mode="" style="--progress: 100%"></time>
     <label class="congrats hidden"></label>
 </section>
-<button class="button is-medium is-rounded theme">
+<button class="timer button is-medium is-rounded theme">
     <i class="fa fa-solid fa-image"></i>
     <span>Switch theme</span>
 </button>
-<button class="button is-medium is-rounded volume">
+<button class="timer button is-medium is-rounded volume">
     <i class="fa fa-solid fa-stopwatch"></i>
     <span>Ticking sound</span>
 </button>
-<button class="button is-medium is-rounded alarm">
+<button class="timer button is-medium is-rounded alarm">
     <i class="fa fa-solid fa-alarm-clock"></i>
     <span>Toggle alarm</span>
 </button>
-<time class="localtime"></time>
+<time class="clock"></time>
 <script type="module" src="shared.js"></script>
+<div class="modal timezones" style="font-size: 10px!important;">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Modify </p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <form class="timezones">
+                <fieldset>
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <input class="input" type="text" placeholder="Timezone"/>
+                        </div>
+                        <div class="control">
+                            <button class="button is-primary">Add</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </section>
+        <footer class="modal-card-foot">
+            <div class="buttons">
+                <button class="button is-success">Save changes</button>
+                <button class="button">Cancel</button>
+            </div>
+        </footer>
+    </div>
+</div>
 </body>
 </html>

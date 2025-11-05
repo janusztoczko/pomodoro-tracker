@@ -1,6 +1,7 @@
 import PomodoroTimer from './classes/PomodoroTimer.js';
 import Ui from './classes/Ui.js';
 import Streamer from './classes/Streamer.js';
+import WorldTime from "./classes/WorldTime.js";
 
 let updater;
 
@@ -12,6 +13,7 @@ const ui = new Ui({
     initialTitle: document.title,
 });
 
+const worldTime = new WorldTime();
 
 timer.on('start', (handler) => {
     if(timer.session.sessionModeTimestamp){
@@ -28,6 +30,7 @@ timer.on('start', (handler) => {
 
 timer.on('tick', ({progress, formatted}) => {
     ui.updateStopwatch(progress, formatted);
+    ui.updateClock(worldTime.getTime(), worldTime.getTimezoneName());
 });
 
 timer.on('mode', (mode) => {
@@ -111,5 +114,9 @@ updater.on('update', (update) => {
     timer.stop();
     ui.setTitle();
     ui.modeLabel();
+});
+
+ui.on('switch-timezone', () => {
+    worldTime.switchSelectedTimezone();
 });
 

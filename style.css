@@ -15,7 +15,10 @@ body {
     background-color: var(--background-color);
     background-size: cover;
     background-position: center;
-    font-size: calc(var(--size-aspect) * .05);
+
+    .stopwatch, .congrats, .clock {
+        font-size: calc(var(--size-aspect) * .05);
+    }
 
     *:focus, *:active {
         outline: none !important;
@@ -102,7 +105,7 @@ body {
         }
     }
 
-    .button {
+    .button.timer {
         position: absolute;
         padding: 0;
         margin: 0;
@@ -153,6 +156,37 @@ body {
                     color: lightgray;
                 }
             }
+        }
+    }
+
+    .clock{
+        position: absolute;
+        bottom: calc(var(--size-aspect) * .05);
+        left: calc(var(--size-aspect) * .05);
+        font-size: calc(var(--size-aspect) * .05);
+        cursor: pointer;
+        display:flex;
+        flex-direction: column;
+
+        width: calc(var(--size-aspect) * .15);
+        height: calc(var(--size-aspect) * .15);
+        background: white;
+        border-radius: 50%;
+        justify-content: center;
+        align-items: center;
+
+        mix-blend-mode: lighten;
+
+        &:before{
+            font-size: calc(var(--size-aspect) * .026);
+            position:relative;
+            content: attr(data-time);
+        }
+        &:after{
+            font-size: calc(var(--size-aspect) * .016);
+            line-height: calc(var(--size-aspect) * .015);
+            position:relative;
+            content: attr(data-timezone);
         }
     }
 
