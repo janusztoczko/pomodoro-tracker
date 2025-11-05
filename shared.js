@@ -119,4 +119,3 @@ updater.on('update', (update) => {
 ui.on('switch-timezone', () => {
     worldTime.switchSelectedTimezone();
 });
-

@@ -5,9 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍅 Pomodoro Timer</title>
-    <link rel="stylesheet" href="bulma.css"/>
-    <link rel="stylesheet" href="style.css"/>
-    <link rel="stylesheet" href="assets/fontawesome/css/all.min.css"/>
+    <link rel="stylesheet" href="assets/styles/bulma.css"/>
+    <link rel="stylesheet" href="assets/styles/style.css"/>
+    <link rel="stylesheet" href="assets/styles/fontawesome/css/all.min.css"/>
 </head>
 <body data-mode="cowork" class="empty">
 <section class="section" id="timer">
@@ -26,24 +26,26 @@
     <i class="fa fa-solid fa-alarm-clock"></i>
     <span>Toggle alarm</span>
 </button>
+<button class="timer button is-medium is-rounded config">
+    <i class="fa fa-solid fa-gear"></i>
+    <span>Configure</span>
+</button>
 <time class="clock"></time>
-<script type="module" src="shared.js"></script>
-<div class="modal timezones" style="font-size: 10px!important;">
+<div class="modal config-panel">
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
-            <p class="modal-card-title">Modify </p>
-            <button class="delete" aria-label="close"></button>
+            <p class="modal-card-title">Timer settings</p>
+            <button class="delete close-modal" aria-label="close"></button>
         </header>
         <section class="modal-card-body">
             <form class="timezones">
                 <fieldset>
                     <div class="field has-addons">
                         <div class="control is-expanded">
-                            <input class="input" type="text" placeholder="Timezone"/>
-                        </div>
-                        <div class="control">
-                            <button class="button is-primary">Add</button>
+                            <label>
+                                <textarea class="textarea" placeholder="Configuration json"></textarea>
+                            </label>
                         </div>
                     </div>
                 </fieldset>
@@ -51,11 +53,13 @@
         </section>
         <footer class="modal-card-foot">
             <div class="buttons">
-                <button class="button is-success">Save changes</button>
-                <button class="button">Cancel</button>
+                <button class="button is-success save">Save changes</button>
+                <button class="button is-danger reset">Reset</button>
+                <button class="button cancel">Cancel</button>
             </div>
         </footer>
     </div>
 </div>
+<script type="module" src="shared.js"></script>
 </body>
 </html>
