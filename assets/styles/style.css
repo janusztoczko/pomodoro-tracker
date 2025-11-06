@@ -218,7 +218,7 @@ body {
         }
     }
 
-    @media (max-width: 250px) {
+    @media (max-width: 320px), (max-height: 320px) {
         .clock, .button.timer {
             display: none;
         }
