@@ -30,7 +30,10 @@ timer.on('start', (handler) => {
 
 timer.on('tick', ({progress, formatted}) => {
     ui.updateStopwatch(progress, formatted);
-    ui.updateClock(worldTime.getTime(), worldTime.getTimezoneName());
+});
+
+worldTime.on('ticking-clock', (seconds) => {
+    ui.updateClock(worldTime.getTime(), worldTime.getTimezoneName(), seconds);
 });
 
 timer.on('mode', (mode) => {

@@ -197,9 +197,10 @@ export default class Ui {
         this.stopwatchEl.style.setProperty('--progress', `${Math.min(100, Math.max(0, progressPct))}%`);
     }
     
-    updateClock(time, timezone) {
+    updateClock(time, timezone, seconds,) {
         this.clockEl.setAttribute('data-time', time);
         this.clockEl.setAttribute('data-timezone', timezone);
+        this.clockEl.setAttribute('style', `--progress: ${seconds}%;`);
     }
     
     showCongrats(mode = 'pomodoro') {

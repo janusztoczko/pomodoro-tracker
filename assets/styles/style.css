@@ -82,8 +82,8 @@ body {
                 content: attr(data-progress);
                 color: var(--primary-color);
                 display: flex;
-                width: calc(100% - 5vh);
-                height: calc(100% - 5vh);
+                width: calc(100% - 1vh);
+                height: calc(100% - 1vh);
                 background: var(--background-color);
                 border-radius: 50%;
                 align-items: center;
@@ -177,8 +177,8 @@ body {
         display: flex;
         flex-direction: column;
 
-        width: calc(var(--size-aspect) * .15);
-        height: calc(var(--size-aspect) * .15);
+        width: calc(var(--size-aspect) * .20);
+        height: calc(var(--size-aspect) * .20);
         background: white;
         border-radius: 50%;
         justify-content: center;
@@ -187,17 +187,34 @@ body {
         mix-blend-mode: lighten;
         opacity: .8;
 
+        background: conic-gradient(
+                var(--primary-color) var(--progress),
+                var(--secondary-color) 0
+        );
+
         &:before {
-            font-size: calc(var(--size-aspect) * .026);
-            position: relative;
             content: attr(data-time);
+            font-size: calc(var(--size-aspect) * .026);
+            position: absolute;
+            color: var(--primary-color);
+            display: flex;
+            width: calc(100% - 1vh);
+            height: calc(100% - 1vh);
+            background: var(--background-color);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
         }
 
         &:after {
-            font-size: calc(var(--size-aspect) * .016);
-            line-height: calc(var(--size-aspect) * .015);
-            position: relative;
             content: attr(data-timezone);
+            display: flex;
+            font-size: calc(var(--size-aspect) * .016);
+            position: absolute;
+            color: var(--primary-color);
+            align-items: center;
+            justify-content: center;
+            top: 55%;
         }
     }
 

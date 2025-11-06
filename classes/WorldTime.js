@@ -27,6 +27,7 @@ export default class WorldTime {
         let self = this;
         this.loadTimezones();
         this.loadSelectedTimezone();
+        this.emitSecondsProgress();
     }
     
     getTime(){
@@ -89,6 +90,17 @@ export default class WorldTime {
     getTimezoneName(timezone = false) {
         if(!timezone) timezone = this.config.selectedTimezone;
         return timezone.split('/')[1].replace('_',' ');
+    }
+    
+    emitSecondsProgress(){
+        const self = this;
+        let seconds;
+        setInterval(() => {
+            let now = new Date();
+            seconds = now.getSeconds();
+            self._emit('ticking-clock', (seconds/60)*100);
+        }, 1000);
+        
     }
 
     _emit(event, payload) {
