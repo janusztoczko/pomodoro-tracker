@@ -1,10 +1,12 @@
+html {
+    min-width: unset;
+}
+
 body {
     --primary-color: #FFF;
     --secondary-color: #000;
     --background-color: #000;
-
     --progress: 0%;
-
     --size-aspect: min(100vh, 100vw);
 
     display: flex;
@@ -53,8 +55,8 @@ body {
     }
 
     .section {
-        width: 100vw;
-        min-width: 300px;
+        width: 100%;
+        height: 100%;
         display: flex;
         margin: 0;
         padding: 0;
@@ -116,7 +118,7 @@ body {
             border-image-width: 0 !important;
         }
 
-        i{
+        i {
             font-size: calc(var(--size-aspect) * .037);
         }
 
@@ -150,7 +152,7 @@ body {
             right: calc(var(--size-aspect) * .05);
         }
 
-        &.config{
+        &.config {
             bottom: calc(var(--size-aspect) * .05);
             right: calc(var(--size-aspect) * .05);
         }
@@ -158,6 +160,7 @@ body {
         &.volume, &.alarm {
             &.mute {
                 opacity: 0.6;
+
                 i {
                     color: lightgray;
                 }
@@ -165,13 +168,13 @@ body {
         }
     }
 
-    .clock{
+    .clock {
         position: absolute;
         bottom: calc(var(--size-aspect) * .05);
         left: calc(var(--size-aspect) * .05);
         font-size: calc(var(--size-aspect) * .05);
         cursor: pointer;
-        display:flex;
+        display: flex;
         flex-direction: column;
 
         width: calc(var(--size-aspect) * .15);
@@ -182,18 +185,25 @@ body {
         align-items: center;
 
         mix-blend-mode: lighten;
-        opacity:.8;
+        opacity: .8;
 
-        &:before{
+        &:before {
             font-size: calc(var(--size-aspect) * .026);
-            position:relative;
+            position: relative;
             content: attr(data-time);
         }
-        &:after{
+
+        &:after {
             font-size: calc(var(--size-aspect) * .016);
             line-height: calc(var(--size-aspect) * .015);
-            position:relative;
+            position: relative;
             content: attr(data-timezone);
+        }
+    }
+
+    @media (max-width: 250px) {
+        .clock, .button.timer {
+            display: none;
         }
     }
 
