@@ -29,14 +29,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout libs
+        uses: actions/checkout@v4
+        with:
+          repository: 'janusztoczko/pomodoro-lib'
+          path: 'classes'
+          ref: 'main'
+          token: ${{ secrets.LIBS }}
+
       - name: Set up GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Upload static content to Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          # Specify the folder containing your static site content
           path: './'
+
 
       - name: Deploy to GitHub Pages
         id: deployment
